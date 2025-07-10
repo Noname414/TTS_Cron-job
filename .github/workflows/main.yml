@@ -1,0 +1,42 @@
+name: 每日論文播客生成
+
+on:
+  workflow_dispatch: # 允許手動觸發
+  schedule:
+    - cron: "0 16 * * *" # 每天 UTC 00:00 = 台灣 08:00
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20 # 最長 20 分鐘內要完成，否則自動取消
+    steps:
+      - name: 簽出程式碼倉庫
+        uses: actions/checkout@v4
+
+      - name: 設定 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: 安裝 uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: 使用 uv 安裝依賴套件
+        run: uv sync
+
+      - name: 執行播客生成工作流程
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # 背景 keep-alive，每 60 秒輸出一次訊息，防止 GitHub idle timeout
+          while true; do echo "🟡 Keep alive... $(date)"; sleep 60; done &
+          # 執行主程式
+          uv run python main.py
+
+      - name: 提交到github
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update podcast"
+          git push
