@@ -1,3 +1,4 @@
+import logging
 from google import genai
 from google.genai import types
 import wave
@@ -9,7 +10,7 @@ def wave_file(filename, pcm, channels=1, rate=24000, sample_width=2):
       wf.setsampwidth(sample_width)
       wf.setframerate(rate)
       wf.writeframes(pcm)
-      print(f"Audio saved to {filename}")
+      logging.info(f"Audio saved to {filename}")
 
 def generate_audio(script):
     client = genai.Client()
@@ -51,8 +52,8 @@ def generate_audio(script):
     wave_file(file_name, data) # Saves the file to current directory
 
 if __name__ == "__main__":
-    print("Generating audio...")
+    logging.info("Generating audio...")
     with open('2507.05257v1_script.txt', 'r', encoding='utf-8') as file:
         script = file.read()
     generate_audio(script)
-    print("Audio generated successfully!")
+    logging.info("Audio generated successfully!")
