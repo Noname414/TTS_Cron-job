@@ -16,7 +16,7 @@ def generate_audio(script):
     prompt = "以中文Podcast方式朗誦以下對話，並以主持人林冠傑和林欣潔的口吻："+script
 
     response = client.models.generate_content(
-    model="gemini-2.5-flash-pro-tts",
+    model="gemini-2.5-pro-preview-tts",
     contents=prompt,
     config=types.GenerateContentConfig(
         response_modalities=["AUDIO"],
